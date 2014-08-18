@@ -461,6 +461,21 @@ System::Object^ ClrFunc::MarshalV8ToCLR(Handle<v8::Value> jsdata)
     }
 }
 
+template<typename T>
+ref class AsyncStateClosure {
+private:
+    System::Object^ state;
+
+public:
+    AsyncStateClosure(AsyncStateClosure<T> ^closure) : this(closure.state) {
+    }
+    AsyncStateClosure(System::Object^ _state) : state(_state) {
+    }
+    void Op(Task<T>^ task) {
+        edgeAppCompletedOnCLRThread(task, state);
+    }
+};
+
 Handle<v8::Value> ClrFunc::Call(Handle<v8::Value> payload, Handle<v8::Value> callback)
 {
     DBG("ClrFunc::Call instance");
@@ -491,8 +506,9 @@ Handle<v8::Value> ClrFunc::Call(Handle<v8::Value> payload, Handle<v8::Value> cal
             context->InitializeAsyncOperation();
 
             // Will complete asynchronously. Schedule continuation to finish processing.
-            task->ContinueWith(gcnew System::Action<Task<System::Object^>^,System::Object^>(
-                edgeAppCompletedOnCLRThread), context);
+			AsyncStateClosure<System::Object^>^ closure = gcnew AsyncStateClosure<System::Object^>(context);
+			task->ContinueWith(gcnew System::Action<Task<System::Object^>^>(
+                closure, &AsyncStateClosure<System::Object^>::Op));
         }
     }
     catch (System::Exception^ e)
