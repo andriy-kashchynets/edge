@@ -43,7 +43,10 @@ namespace EdgeJs
             initialized = true;
             waitHandle.Set();
 
-            return Task<object>.FromResult((object)null);
+            var task = new Task<object>(() => { return null; });
+            task.Start();
+
+            return task;
         }
 
         [DllImport("node.dll", EntryPoint = "#585", CallingConvention = CallingConvention.Cdecl)]
