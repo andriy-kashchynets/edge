@@ -353,7 +353,7 @@ Handle<v8::Object> ClrFunc::MarshalCLRObjectToV8(System::Object^ netdata)
                     System::Web::Script::Serialization::ScriptIgnoreAttribute::typeid,
                     true);
 
-            if (attr != nullptr && attr->ApplyToOverrides)
+            if (attr != nullptr)
             {
                 continue;
             }
