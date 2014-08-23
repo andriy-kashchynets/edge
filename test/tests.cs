@@ -101,13 +101,13 @@ namespace Edge.Tests
 
         public Task<object> Invoke(dynamic input)
         {
-            return Task.FromResult<object>(".NET welcomes " + input);
+            return TaskEx.FromResult<object>(".NET welcomes " + input);
         }
 
         public Task<object> MarshalIn(dynamic input)
         {
             string result = ValidateMarshalNodeJsToNet(input, true);
-            return Task.FromResult<object>(result);
+            return TaskEx.FromResult<object>(result);
         }
 
         public Task<object> MarshalBack(dynamic input)
@@ -124,7 +124,7 @@ namespace Edge.Tests
             result.i = (Func<object,Task<object>>)(async (i) => { return i; });
             result.j = new DateTime(2013, 08, 30);
 
-            return Task.FromResult<object>(result);
+            return TaskEx.FromResult<object>(result);
         }       
 
         public Task<object> NetExceptionTaskStart(dynamic input)
@@ -261,6 +261,14 @@ namespace Edge.Tests
         {
             public string B_field;
             public string B_prop { get; set; }
+        }
+    }
+
+    static class TaskEx
+    {
+        public static Task<TResult> FromResult<TResult> (TResult result) 
+        {
+            return Task<TResult>.Factory.StartNew(() => { return result; });
         }
     }
 }
