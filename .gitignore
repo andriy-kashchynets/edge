@@ -22,7 +22,6 @@ obj/
 packages/*
 _ReSharper*
 
-Edge.Tests.*
 node.exe
 Sample105.*
 
